@@ -1167,15 +1167,18 @@
     updateStats(appState.pumpCount + ' 回', appState.pumpPhase > 0 ? 'ATP分解・輸送中' : '待機中');
   }
 
-  function updateAndDrawExocytosis(dt) {
+function updateAndDrawExocytosis(dt) {
     const memX = 480;
+    const centerY = 250;
+    const vesicleR = 46;
+
     appState.exoCycle += 0.0065 * dt;
     if (appState.exoCycle >= 1) {
       appState.exoCycle = 0;
       appState.exoCount++;
       appState.exoReleased.push({
-        x: memX + 35,
-        y: 250 + (Math.random() - 0.5) * 30,
+        x: memX + 80,
+        y: centerY + (Math.random() - 0.5) * 20,
         vx: 1.6 + Math.random() * 0.8,
         vy: (Math.random() - 0.5) * 1.4,
         alpha: 1
@@ -1187,31 +1190,25 @@
     ctx.fillStyle = 'rgba(14, 165, 233, 0.07)';
     ctx.fillRect(memX, 0, W - memX, H);
 
-    const openRatio = appState.exoCycle > 0.55 ? Math.sin(((appState.exoCycle - 0.55) / 0.45) * Math.PI) : 0;
-    const gap = openRatio * 54;
-
     ctx.strokeStyle = '#0f766e';
     ctx.lineWidth = 10;
     ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(memX, 25);
-    ctx.lineTo(memX, 250 - gap);
-    if (gap > 4) {
-      ctx.arc(memX - 38, 250, 48, -Math.PI * 0.35, Math.PI * 0.35, true);
-    }
-    ctx.moveTo(memX, 250 + gap);
-    ctx.lineTo(memX, H - 25);
-    ctx.stroke();
+    ctx.lineJoin = 'round';
 
     let stageLabel = '小胞が細胞膜へ接近';
     if (appState.exoCycle <= 0.55) {
+      ctx.beginPath();
+      ctx.moveTo(memX, 25);
+      ctx.lineTo(memX, H - 25);
+      ctx.stroke();
+
       const t = appState.exoCycle / 0.55;
-      const vx = 160 + t * (memX - 210);
+      const vx = 160 + t * (memX - vesicleR - 160);
       ctx.fillStyle = 'rgba(15, 118, 110, 0.16)';
       ctx.strokeStyle = '#0f766e';
       ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.arc(vx, 250, 46, 0, Math.PI * 2);
+      ctx.arc(vx, centerY, vesicleR, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
@@ -1219,18 +1216,37 @@
       ctx.strokeStyle = '#9a3412';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(vx, 250, 20, 0, Math.PI * 2);
+      ctx.arc(vx, centerY, 20, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     } else {
-      stageLabel = openRatio > 0.4 ? '膜が開口して放出！' : '細胞膜と融合中';
       const releaseT = (appState.exoCycle - 0.55) / 0.45;
-      const px = memX - 35 + releaseT * 115;
+      const theta = 0.08 + releaseT * (Math.PI - 0.12);
+      const dx = vesicleR * Math.cos(theta);
+      const gapY = vesicleR * Math.sin(theta);
+      const cx = memX - dx;
+
+      ctx.beginPath();
+      ctx.moveTo(memX, 25);
+      ctx.lineTo(memX, centerY - gapY);
+      ctx.arc(cx, centerY, vesicleR, -theta, theta, true);
+      ctx.lineTo(memX, H - 25);
+      ctx.stroke();
+
+      if (releaseT < 0.35) {
+        stageLabel = '細胞膜と融合・開口';
+      } else if (releaseT < 0.75) {
+        stageLabel = '膜が開口して放出！';
+      } else {
+        stageLabel = '細胞膜が元の形へ戻る';
+      }
+
+      const px = memX - vesicleR + releaseT * 126;
       ctx.fillStyle = '#f97316';
       ctx.strokeStyle = '#9a3412';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(px, 250, 20, 0, Math.PI * 2);
+      ctx.arc(px, centerY, 20, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     }
