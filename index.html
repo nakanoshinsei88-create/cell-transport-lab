@@ -555,3 +555,956 @@
   </style>
 </head>
 <!-- === [PART 1 ここまで] この真下に PART 2 を貼り付け === -->
+<!-- === [PART 2 ここから] PART 1 の真下に貼り付け === -->
+<body>
+  <div class="app-container">
+
+    <!-- [ブロック：ヘッダーHTML] ここから -->
+    <header class="app-header">
+      <div class="brand-group">
+        <div class="brand-emblem" aria-hidden="true">
+          <img src="assets/logo-cell.png" alt="" onerror="this.style.display='none';">
+          <span>CELL</span>
+        </div>
+        <div>
+          <h1 class="brand-title">物質の移動ラボ（図1-6）</h1>
+          <p class="brand-sub">拡散・浸透・能動輸送・開口分泌を動かして理解する生理学教材</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="pill-badge">半透性：細胞膜・毛細血管</span>
+        <span class="pill-badge">受動輸送：拡散・浸透・濾過</span>
+      </div>
+    </header>
+    <!-- [ブロック：ヘッダーHTML] ここまで -->
+
+    <!-- [ブロック：移動ルート・イオン概要バーHTML] ここから -->
+    <section class="overview-strip" aria-label="体液の移動ルートとイオン組成">
+      <div class="mini-info-card">
+        <div class="mini-info-label">必要物質の移動ルート（不要物質は逆順で排出）</div>
+        <div class="route-flow">
+          <span class="route-node">血液</span>
+          <span class="route-arrow">⇄</span>
+          <span class="route-node">細胞外液</span>
+          <span class="route-arrow">⇄</span>
+          <span class="route-node">細胞内液</span>
+        </div>
+      </div>
+      <div class="mini-info-card">
+        <div class="mini-info-label">細胞外液・細胞内液の主なイオン組成</div>
+        <div class="ion-row">
+          <span class="ion-tag ion-ext">細胞外液に多い：Na⁺ ・ Cl⁻</span>
+          <span class="ion-tag ion-int">細胞内液に多い：K⁺ ・ HPO₄²⁻ ・ タンパク質陰イオン</span>
+        </div>
+      </div>
+    </section>
+    <!-- [ブロック：移動ルート・イオン概要バーHTML] ここまで -->
+
+    <!-- [ブロック：4モード切替タブHTML] ここから -->
+    <nav class="mode-tabs" role="tablist" aria-label="物質の移動モード選択">
+      <button type="button" class="tab-btn is-active" data-mode="diffusion" role="tab" aria-selected="true">
+        <span class="tab-code">TYPE A</span>
+        <span class="tab-name">A 拡散</span>
+        <span class="tab-meta">受動輸送（エネルギー不要）</span>
+      </button>
+      <button type="button" class="tab-btn" data-mode="osmosis" role="tab" aria-selected="false">
+        <span class="tab-code">TYPE B</span>
+        <span class="tab-name">B 浸透</span>
+        <span class="tab-meta">受動輸送（半透膜・水の移動）</span>
+      </button>
+      <button type="button" class="tab-btn" data-mode="active" role="tab" aria-selected="false">
+        <span class="tab-code">TYPE C</span>
+        <span class="tab-name">C 能動輸送</span>
+        <span class="tab-meta">ATP消費・ポンプ輸送</span>
+      </button>
+      <button type="button" class="tab-btn" data-mode="exocytosis" role="tab" aria-selected="false">
+        <span class="tab-code">TYPE D</span>
+        <span class="tab-name">D 開口分泌</span>
+        <span class="tab-meta">小胞と細胞膜の融合・放出</span>
+      </button>
+    </nav>
+    <!-- [ブロック：4モード切替タブHTML] ここまで -->
+
+    <!-- [ブロック：シミュレーター・解説エリアHTML] ここから -->
+    <main class="lab-grid">
+      <section class="canvas-card" aria-label="物質の移動シミュレーション">
+        <div class="canvas-header">
+          <h2 class="canvas-title" id="simTitle">A 拡散（溶質分子が均一に広がる）</h2>
+          <span class="energy-chip energy-passive" id="energyBadge">受動輸送：ATP不要</span>
+        </div>
+
+        <div class="canvas-stage">
+          <canvas id="simCanvas" width="800" height="500"></canvas>
+        </div>
+
+        <div class="legend-bar" id="legendBar">
+          <span class="legend-item"><span class="dot" style="background:#0ea5e9;"></span>水の分子</span>
+          <span class="legend-item"><span class="dot" style="background:#f97316;"></span>溶質分子・輸送物質</span>
+          <span class="legend-item"><span class="dot" style="background:#0f766e;"></span>半透膜・細胞膜</span>
+          <span class="legend-item"><span class="dot" style="background:#eab308;"></span>ATP / ポンプ反応</span>
+        </div>
+
+        <div class="controls-bar">
+          <button type="button" class="ctrl-btn primary" id="btnTogglePlay">一時停止</button>
+          <button type="button" class="ctrl-btn" id="btnReset">初期状態に戻す</button>
+          <button type="button" class="ctrl-btn action-special" id="btnSpecialAction">溶質を底に再投入</button>
+          <label class="slider-wrap" for="speedRange">
+            <span>速度</span>
+            <input type="range" id="speedRange" min="0.4" max="2.4" step="0.2" value="1">
+            <span id="speedLabel">1.0x</span>
+          </label>
+        </div>
+      </section>
+
+      <aside class="explain-card" aria-label="仕組みのポイント解説">
+        <h3 class="explain-heading" id="explainHeading">A 拡散の仕組み</h3>
+        <p class="explain-text" id="explainText">
+          溶質分子が濃度の高い場所（底に溜まった状態）から濃度の低い場所へと移動し、やがて全体が均一な濃度になります。
+        </p>
+        <ul class="point-list" id="pointList">
+          <li>エネルギー（ATP）を使わない「受動輸送」です。</li>
+          <li>分子自身の熱運動によって自然に広がります。</li>
+          <li>濾過（ろか）や浸透も同様にエネルギーを必要としません。</li>
+        </ul>
+        <div class="stat-meter">
+          <div>
+            <div id="statLabel1">拡散の進み具合</div>
+            <div class="stat-value" id="statVal1">0%</div>
+          </div>
+          <div>
+            <div id="statLabel2">状態ステータス</div>
+            <div class="stat-value" id="statVal2">移動中</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+    <!-- [ブロック：シミュレーター・解説エリアHTML] ここまで -->
+
+    <!-- [ブロック：確認ミニクイズHTML] ここから -->
+    <section class="quiz-card" aria-label="理解度チェッククイズ">
+      <div class="canvas-header">
+        <h3 class="quiz-section-title">理解度チェック（国家試験対策ミニクイズ）</h3>
+        <span class="pill-badge" id="quizProgress">問題 1 / 4</span>
+      </div>
+      <p class="quiz-question" id="quizQuestion">読み込み中...</p>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button type="button" class="ctrl-btn primary" id="btnNextQuiz">次の問題へ</button>
+    </section>
+    <!-- [ブロック：確認ミニクイズHTML] ここまで -->
+
+    <!-- === [新規機能追加エリア：HTML] 新しいHTMLブロックはこの真上に貼り付け === -->
+  </div>
+
+  <div class="toast-box" id="toastBox" role="status" aria-live="polite"></div>
+<!-- === [PART 2 ここまで] この真下に PART 3 を貼り付け === -->
+<!-- === [PART 3 ここから] PART 2 の真下に貼り付け === -->
+<script>
+  // --- [ブロック：状態管理・モード定義JS] ここから ---
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+
+  const appState = {
+    mode: 'diffusion',
+    isPlaying: true,
+    speed: 1.0,
+    time: 0,
+    solutes: [],
+    waters: [],
+    osmosisLevel: 0,
+    atpQueue: 0,
+    pumpPhase: 0,
+    pumpCount: 0,
+    activeParticles: [],
+    exoCycle: 0,
+    exoReleased: [],
+    exoCount: 0
+  };
+
+  const MODE_DATA = {
+    diffusion: {
+      title: 'A 拡散（溶質分子が均一に広がる）',
+      badge: '受動輸送：ATP不要',
+      isActiveTransport: false,
+      actionLabel: '溶質を底に再投入',
+      heading: 'A 拡散の仕組み',
+      text: '溶質分子が濃度の高い場所（底に溜まった状態）から濃度の低い場所へと移動し、やがて全体が均一な濃度になります。',
+      points: [
+        'エネルギー（ATP）を使わない「受動輸送」です。',
+        '分子自身のランダムな熱運動によって自然に広がります。',
+        '拡散・浸透・濾過はいずれもエネルギーを必要としません。'
+      ],
+      statLabel1: '拡散の進み具合',
+      statLabel2: '状態ステータス'
+    },
+    osmosis: {
+      title: 'B 浸透（半透膜を通して水が移動する）',
+      badge: '受動輸送：ATP不要',
+      isActiveTransport: false,
+      actionLabel: '左右の液面をリセット',
+      heading: 'B 浸透の仕組み',
+      text: '溶質を通さず水だけを通す「半透膜」を隔てると、水分子は濃度の低い側（左）から高い側（右）へ移動し、右側の液面が上がります。',
+      points: [
+        '細胞膜や毛細血管は半透性を備えています。',
+        '溶質分子は半透膜を通過できず、水分子だけが通過します。',
+        '水を引っ張る力（浸透圧）は、溶質濃度が高いほど強くなります。'
+      ],
+      statLabel1: '右側の液面差',
+      statLabel2: '浸透の状態'
+    },
+    active: {
+      title: 'C 能動輸送（ATPとポンプで濃度勾配に逆らう）',
+      badge: '能動輸送：ATP必要',
+      isActiveTransport: true,
+      actionLabel: 'ATPを1回投入（ポンプ作動）',
+      heading: 'C 能動輸送の仕組み',
+      text: '濃度の低い側（細胞内）から濃度の高い側（細胞外）へ、膜の「ポンプ」とATPのエネルギーを使って物質を運び出します。',
+      points: [
+        'ATPがADPに分解される際のエネルギーを利用します。',
+        '濃度勾配に逆らって輸送できるのが受動輸送との決定的な違いです。',
+        '細胞外液にNa⁺が多く、細胞内液にK⁺が多い状態もポンプで維持されます。'
+      ],
+      statLabel1: 'ポンプ輸送回数',
+      statLabel2: 'ATP反応状態'
+    },
+    exocytosis: {
+      title: 'D 開口分泌（小胞が細胞膜と融合して放出）',
+      badge: '膜動輸送：ATP必要',
+      isActiveTransport: true,
+      actionLabel: '今すぐ開口分泌を実行',
+      heading: 'D 開口分泌の仕組み',
+      text: '細胞内で膜に包まれた大きな物質（小胞）が細胞膜に近づいて融合し、外側へ開いて中身を細胞外へ放出します。',
+      points: [
+        'ホルモンや神経伝達物質、消化酵素などの放出に使われます。',
+        'ポンプを通れない大きな分子をまとめて外へ出せる仕組みです。',
+        '逆に細胞外から取り込む仕組みは食作用・飲作用と呼ばれます。'
+      ],
+      statLabel1: '放出された回数',
+      statLabel2: '現在のステージ'
+    }
+  };
+  // --- [ブロック：状態管理・モード定義JS] ここまで ---
+
+  // --- [ブロック：各モード初期化ロジックJS] ここから ---
+  function initModeSimulation(modeName) {
+    appState.mode = modeName;
+    appState.time = 0;
+    appState.solutes = [];
+    appState.waters = [];
+    appState.osmosisLevel = 0;
+    appState.atpQueue = 0;
+    appState.pumpPhase = 0;
+    appState.pumpCount = 0;
+    appState.activeParticles = [];
+    appState.exoCycle = 0;
+    appState.exoReleased = [];
+    appState.exoCount = 0;
+
+    if (modeName === 'diffusion') {
+      for (let i = 0; i < 42; i++) {
+        appState.waters.push({
+          x: 210 + Math.random() * 380,
+          y: 120 + Math.random() * 305,
+          vx: (Math.random() - 0.5) * 1.4,
+          vy: (Math.random() - 0.5) * 1.4
+        });
+      }
+      for (let i = 0; i < 22; i++) {
+        appState.solutes.push({
+          x: 250 + Math.random() * 300,
+          y: 385 + Math.random() * 42,
+          vx: (Math.random() - 0.5) * 1.9,
+          vy: -Math.random() * 1.6 - 0.3
+        });
+      }
+    } else if (modeName === 'osmosis') {
+      for (let i = 0; i < 30; i++) {
+        appState.waters.push({
+          x: 155 + Math.random() * 235,
+          y: 230 + Math.random() * 195,
+          vx: (Math.random() - 0.5) * 1.6,
+          vy: (Math.random() - 0.5) * 1.6,
+          side: 'left'
+        });
+      }
+      for (let i = 0; i < 18; i++) {
+        appState.waters.push({
+          x: 410 + Math.random() * 235,
+          y: 230 + Math.random() * 195,
+          vx: (Math.random() - 0.5) * 1.6,
+          vy: (Math.random() - 0.5) * 1.6,
+          side: 'right'
+        });
+      }
+      for (let i = 0; i < 5; i++) {
+        appState.solutes.push({
+          x: 165 + Math.random() * 215,
+          y: 245 + Math.random() * 175,
+          vx: (Math.random() - 0.5) * 0.9,
+          vy: (Math.random() - 0.5) * 0.9,
+          side: 'left'
+        });
+      }
+      for (let i = 0; i < 20; i++) {
+        appState.solutes.push({
+          x: 420 + Math.random() * 215,
+          y: 245 + Math.random() * 175,
+          vx: (Math.random() - 0.5) * 0.9,
+          vy: (Math.random() - 0.5) * 0.9,
+          side: 'right'
+        });
+      }
+    } else if (modeName === 'active') {
+      for (let i = 0; i < 4; i++) {
+        appState.activeParticles.push({
+          x: 80 + Math.random() * 220,
+          y: 110 + Math.random() * 290,
+          vx: (Math.random() - 0.5) * 1.1,
+          vy: (Math.random() - 0.5) * 1.1,
+          side: 'in'
+        });
+      }
+      for (let i = 0; i < 14; i++) {
+        appState.activeParticles.push({
+          x: 495 + Math.random() * 240,
+          y: 95 + Math.random() * 320,
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: (Math.random() - 0.5) * 1.2,
+          side: 'out'
+        });
+      }
+    } else if (modeName === 'exocytosis') {
+      appState.exoCycle = 0.05;
+    }
+  }
+  // --- [ブロック：各モード初期化ロジックJS] ここまで ---
+
+  // --- [ブロック：Canvas描画エンジンJS] ここから ---
+  function drawBeaker(x, y, w, h) {
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x - 10, y);
+    ctx.lineTo(x, y + 12);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x + w, y + 12);
+    ctx.lineTo(x + w + 10, y);
+    ctx.stroke();
+  }
+
+  function updateAndDrawDiffusion(dt) {
+    const bx = 190;
+    const by = 80;
+    const bw = 420;
+    const bh = 360;
+    const topY = by + 35;
+
+    ctx.fillStyle = 'rgba(14, 165, 233, 0.12)';
+    ctx.fillRect(bx + 2, topY, bw - 4, by + bh - topY - 2);
+    ctx.strokeStyle = 'rgba(14, 165, 233, 0.45)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(bx + 2, topY);
+    ctx.lineTo(bx + bw - 2, topY);
+    ctx.stroke();
+
+    drawBeaker(bx, by, bw, bh);
+
+    for (const w of appState.waters) {
+      w.x += w.vx * dt;
+      w.y += w.vy * dt;
+      if (w.x < bx + 12 || w.x > bx + bw - 12) w.vx *= -1;
+      if (w.y < topY + 12 || w.y > by + bh - 12) w.vy *= -1;
+      ctx.fillStyle = '#0ea5e9';
+      ctx.beginPath();
+      ctx.arc(w.x, w.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    let ySum = 0;
+    for (const s of appState.solutes) {
+      s.vx += (Math.random() - 0.5) * 0.14 * dt;
+      s.vy += (Math.random() - 0.5) * 0.14 * dt;
+      if (s.y > by + bh - 80) s.vy -= 0.03 * dt;
+      const maxV = 2.2;
+      s.vx = Math.max(-maxV, Math.min(maxV, s.vx));
+      s.vy = Math.max(-maxV, Math.min(maxV, s.vy));
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+
+      if (s.x < bx + 14) { s.x = bx + 14; s.vx = Math.abs(s.vx); }
+      if (s.x > bx + bw - 14) { s.x = bx + bw - 14; s.vx = -Math.abs(s.vx); }
+      if (s.y < topY + 14) { s.y = topY + 14; s.vy = Math.abs(s.vy); }
+      if (s.y > by + bh - 14) { s.y = by + bh - 14; s.vy = -Math.abs(s.vy); }
+
+      ySum += s.y;
+      ctx.fillStyle = '#f97316';
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    const avgY = ySum / Math.max(1, appState.solutes.length);
+    const targetY = (topY + by + bh) / 2;
+    const startY = by + bh - 35;
+    const progress = Math.max(0, Math.min(100, Math.round(((startY - avgY) / (startY - targetY)) * 100)));
+
+    ctx.fillStyle = '#334155';
+    ctx.font = 'bold 15px "Zen Kaku Gothic New", sans-serif';
+    ctx.fillText('濃度の高い底から全体へ自然に広がる', bx + 75, 48);
+
+    updateStats(progress + '%', progress >= 85 ? 'ほぼ均一' : '拡散中');
+  }
+
+  function updateAndDrawOsmosis(dt) {
+    const bx = 140;
+    const by = 90;
+    const bw = 520;
+    const bh = 350;
+    const midX = bx + bw / 2;
+
+    if (appState.osmosisLevel < 75) {
+      appState.osmosisLevel = Math.min(75, appState.osmosisLevel + 0.18 * dt);
+    }
+
+    const leftTop = 215 + appState.osmosisLevel * 0.65;
+    const rightTop = 215 - appState.osmosisLevel * 1.1;
+
+    ctx.fillStyle = 'rgba(14, 165, 233, 0.14)';
+    ctx.fillRect(bx + 2, leftTop, bw / 2 - 2, by + bh - leftTop - 2);
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.11)';
+    ctx.fillRect(midX, rightTop, bw / 2 - 2, by + bh - rightTop - 2);
+
+    ctx.strokeStyle = '#0ea5e9';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(bx + 2, leftTop);
+    ctx.lineTo(midX, leftTop);
+    ctx.moveTo(midX, rightTop);
+    ctx.lineTo(bx + bw - 2, rightTop);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 4;
+    ctx.setLineDash(Array(2).fill(8));
+    ctx.beginPath();
+    ctx.moveTo(midX, by - 12);
+    ctx.lineTo(midX, by + bh);
+    ctx.stroke();
+    ctx.restore();
+
+    drawBeaker(bx, by, bw, bh);
+
+    for (const w of appState.waters) {
+      w.x += w.vx * dt;
+      w.y += w.vy * dt;
+      if (w.side === 'left' && w.x > midX - 6 && Math.random() < 0.04 * dt && appState.osmosisLevel < 75) {
+        w.side = 'right';
+        w.x = midX + 10;
+        w.vx = Math.abs(w.vx) + 0.3;
+      }
+      const minX = w.side === 'left' ? bx + 10 : midX + 8;
+      const maxX = w.side === 'left' ? midX - 8 : bx + bw - 10;
+      const minY = (w.side === 'left' ? leftTop : rightTop) + 10;
+      const maxY = by + bh - 10;
+      if (w.x < minX) { w.x = minX; w.vx = Math.abs(w.vx); }
+      if (w.x > maxX) { w.x = maxX; w.vx = -Math.abs(w.vx); }
+      if (w.y < minY) { w.y = minY; w.vy = Math.abs(w.vy); }
+      if (w.y > maxY) { w.y = maxY; w.vy = -Math.abs(w.vy); }
+
+      ctx.fillStyle = '#0ea5e9';
+      ctx.beginPath();
+      ctx.arc(w.x, w.y, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    for (const s of appState.solutes) {
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      const minX = s.side === 'left' ? bx + 14 : midX + 14;
+      const maxX = s.side === 'left' ? midX - 14 : bx + bw - 14;
+      const minY = (s.side === 'left' ? leftTop : rightTop) + 14;
+      const maxY = by + bh - 14;
+      if (s.x < minX) { s.x = minX; s.vx = Math.abs(s.vx); }
+      if (s.x > maxX) { s.x = maxX; s.vx = -Math.abs(s.vx); }
+      if (s.y < minY) { s.y = minY; s.vy = Math.abs(s.vy); }
+      if (s.y > maxY) { s.y = maxY; s.vy = -Math.abs(s.vy); }
+
+      ctx.fillStyle = '#f97316';
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 8.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#0f766e';
+    ctx.font = 'bold 15px "Zen Kaku Gothic New", sans-serif';
+    ctx.fillText('半透膜（水のみ通過）', midX - 75, 58);
+    ctx.fillStyle = '#0369a1';
+    ctx.fillText('低濃度（水が多い）', bx + 45, 472);
+    ctx.fillStyle = '#c2410c';
+    ctx.fillText('高濃度（溶質が多い）', midX + 45, 472);
+
+    if (appState.osmosisLevel < 74) {
+      ctx.fillStyle = '#0284c7';
+      ctx.font = 'bold 16px "Zen Kaku Gothic New", sans-serif';
+      ctx.fillText('水分子が右へ移動 →', midX - 74, 330);
+    }
+
+    const diffHeight = Math.round(appState.osmosisLevel * 1.75);
+    updateStats('+' + diffHeight + ' mm相当', appState.osmosisLevel >= 74 ? '平衡に到達' : '水が浸透中');
+  }
+
+  function updateAndDrawActive(dt) {
+    const memX = 365;
+    const memW = 70;
+    const pumpY = 250;
+
+    ctx.fillStyle = 'rgba(241, 245, 249, 0.9)';
+    ctx.fillRect(0, 0, memX, H);
+    ctx.fillStyle = 'rgba(254, 243, 199, 0.25)';
+    ctx.fillRect(memX + memW, 0, W - (memX + memW), H);
+
+    ctx.fillStyle = 'rgba(15, 118, 110, 0.16)';
+    ctx.fillRect(memX, 20, memW, H - 40);
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(memX, 20);
+    ctx.lineTo(memX, H - 20);
+    ctx.moveTo(memX + memW, 20);
+    ctx.lineTo(memX + memW, H - 20);
+    ctx.stroke();
+
+    if (appState.pumpPhase === 0 && (appState.atpQueue > 0 || Math.floor(appState.time) % 160 === 40)) {
+      if (appState.atpQueue > 0) appState.atpQueue--;
+      appState.pumpPhase = 0.01;
+    }
+    if (appState.pumpPhase > 0) {
+      appState.pumpPhase += 0.015 * dt;
+      if (appState.pumpPhase >= 1) {
+        appState.pumpPhase = 0;
+        appState.pumpCount++;
+        appState.activeParticles.push({
+          x: memX + memW + 25,
+          y: pumpY + (Math.random() - 0.5) * 20,
+          vx: 1.5,
+          vy: (Math.random() - 0.5) * 1.4,
+          side: 'out'
+        });
+        if (appState.activeParticles.length > 26) {
+          const idxOut = appState.activeParticles.findIndex(function(p) { return p.side === 'out'; });
+          if (idxOut >= 0) appState.activeParticles.splice(idxOut, 1);
+        }
+      }
+    }
+
+    const pulse = appState.pumpPhase > 0 ? Math.sin(appState.pumpPhase * Math.PI) * 10 : 0;
+    ctx.fillStyle = appState.pumpPhase > 0 ? '#fef08a' : '#ffffff';
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(memX + memW / 2, pumpY, 44 + pulse * 0.4, 52 - pulse * 0.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 16px "Zen Kaku Gothic New", sans-serif';
+    ctx.fillText('ポンプ', memX + 11, pumpY + 6);
+
+    if (appState.pumpPhase > 0) {
+      const px = memX - 65 + appState.pumpPhase * (memW + 130);
+      const py = pumpY + Math.sin(appState.pumpPhase * Math.PI) * 12;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(px, py, 11, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#b45309';
+      ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('ATP → ADP + エネルギー!', 120, pumpY - 14);
+    } else {
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('ATP 待機中', 240, pumpY - 10);
+    }
+
+    for (const p of appState.activeParticles) {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      const minX = p.side === 'in' ? 30 : memX + memW + 20;
+      const maxX = p.side === 'in' ? memX - 24 : W - 30;
+      if (p.x < minX) { p.x = minX; p.vx = Math.abs(p.vx); }
+      if (p.x > maxX) { p.x = maxX; p.vx = -Math.abs(p.vx); }
+      if (p.y < 75) { p.y = 75; p.vy = Math.abs(p.vy); }
+      if (p.y > H - 40) { p.y = H - 40; p.vy = -Math.abs(p.vy); }
+
+      ctx.fillStyle = '#f97316';
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 17px "Zen Kaku Gothic New", sans-serif';
+    ctx.fillText('細胞内（低濃度）', 110, 46);
+    ctx.fillText('細胞外（高濃度）', 525, 46);
+
+    updateStats(appState.pumpCount + ' 回', appState.pumpPhase > 0 ? 'ATP分解・輸送中' : '待機中');
+  }
+
+  function updateAndDrawExocytosis(dt) {
+    const memX = 480;
+    appState.exoCycle += 0.0065 * dt;
+    if (appState.exoCycle >= 1) {
+      appState.exoCycle = 0;
+      appState.exoCount++;
+      appState.exoReleased.push({
+        x: memX + 35,
+        y: 250 + (Math.random() - 0.5) * 30,
+        vx: 1.6 + Math.random() * 0.8,
+        vy: (Math.random() - 0.5) * 1.4,
+        alpha: 1
+      });
+    }
+
+    ctx.fillStyle = 'rgba(241, 245, 249, 0.9)';
+    ctx.fillRect(0, 0, memX, H);
+    ctx.fillStyle = 'rgba(14, 165, 233, 0.07)';
+    ctx.fillRect(memX, 0, W - memX, H);
+
+    const openRatio = appState.exoCycle > 0.55 ? Math.sin(((appState.exoCycle - 0.55) / 0.45) * Math.PI) : 0;
+    const gap = openRatio * 54;
+
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 10;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(memX, 25);
+    ctx.lineTo(memX, 250 - gap);
+    if (gap > 4) {
+      ctx.arc(memX - 38, 250, 48, -Math.PI * 0.35, Math.PI * 0.35, true);
+    }
+    ctx.moveTo(memX, 250 + gap);
+    ctx.lineTo(memX, H - 25);
+    ctx.stroke();
+
+    let stageLabel = '小胞が細胞膜へ接近';
+    if (appState.exoCycle <= 0.55) {
+      const t = appState.exoCycle / 0.55;
+      const vx = 160 + t * (memX - 210);
+      ctx.fillStyle = 'rgba(15, 118, 110, 0.16)';
+      ctx.strokeStyle = '#0f766e';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(vx, 250, 46, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#f97316';
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(vx, 250, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      stageLabel = openRatio > 0.4 ? '膜が開口して放出！' : '細胞膜と融合中';
+      const releaseT = (appState.exoCycle - 0.55) / 0.45;
+      const px = memX - 35 + releaseT * 115;
+      ctx.fillStyle = '#f97316';
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(px, 250, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    for (let i = appState.exoReleased.length - 1; i >= 0; i--) {
+      const r = appState.exoReleased[i];
+      r.x += r.vx * dt;
+      r.y += r.vy * dt;
+      r.alpha -= 0.004 * dt;
+      if (r.alpha <= 0 || r.x > W + 30) {
+        appState.exoReleased.splice(i, 1);
+        continue;
+      }
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, r.alpha);
+      ctx.fillStyle = '#f97316';
+      ctx.strokeStyle = '#9a3412';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 17px "Zen Kaku Gothic New", sans-serif';
+    ctx.fillText('細胞内（小胞輸送）', 150, 46);
+    ctx.fillText('細胞膜', memX - 24, 46);
+    ctx.fillText('細胞外へ放出', 575, 46);
+
+    updateStats(appState.exoCount + ' 回', stageLabel);
+  }
+  // --- [ブロック：Canvas描画エンジンJS] ここまで ---
+  // --- [ブロック：メインループ・UI更新JS] ここから ---
+  const elSimTitle = document.getElementById('simTitle');
+  const elEnergyBadge = document.getElementById('energyBadge');
+  const elBtnTogglePlay = document.getElementById('btnTogglePlay');
+  const elBtnReset = document.getElementById('btnReset');
+  const elBtnSpecial = document.getElementById('btnSpecialAction');
+  const elSpeedRange = document.getElementById('speedRange');
+  const elSpeedLabel = document.getElementById('speedLabel');
+  const elExplainHeading = document.getElementById('explainHeading');
+  const elExplainText = document.getElementById('explainText');
+  const elPointList = document.getElementById('pointList');
+  const elStatLabel1 = document.getElementById('statLabel1');
+  const elStatVal1 = document.getElementById('statVal1');
+  const elStatLabel2 = document.getElementById('statLabel2');
+  const elStatVal2 = document.getElementById('statVal2');
+  const elToastBox = document.getElementById('toastBox');
+  const tabButtons = document.querySelectorAll('.tab-btn');
+
+  let toastTimer = null;
+
+  function showToast(message) {
+    elToastBox.textContent = message;
+    elToastBox.classList.add('is-show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() {
+      elToastBox.classList.remove('is-show');
+    }, 2400);
+  }
+
+  function updateStats(val1, val2) {
+    elStatVal1.textContent = val1;
+    elStatVal2.textContent = val2;
+  }
+
+  function applyModeUI(modeName) {
+    const info = MODE_DATA[modeName];
+    if (!info) return;
+
+    elSimTitle.textContent = info.title;
+    elEnergyBadge.textContent = info.badge;
+    elEnergyBadge.className = info.isActiveTransport
+      ? 'energy-chip energy-active'
+      : 'energy-chip energy-passive';
+    elBtnSpecial.textContent = info.actionLabel;
+    elExplainHeading.textContent = info.heading;
+    elExplainText.textContent = info.text;
+    elStatLabel1.textContent = info.statLabel1;
+    elStatLabel2.textContent = info.statLabel2;
+
+    elPointList.innerHTML = '';
+    for (const pt of info.points) {
+      const li = document.createElement('li');
+      li.textContent = pt;
+      elPointList.appendChild(li);
+    }
+
+    tabButtons.forEach(function(btn) {
+      const active = btn.dataset.mode === modeName;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  }
+
+  function animationLoop() {
+    ctx.clearRect(0, 0, W, H);
+    const dt = appState.isPlaying ? appState.speed : 0;
+    appState.time += dt;
+
+    if (appState.mode === 'diffusion') {
+      updateAndDrawDiffusion(dt);
+    } else if (appState.mode === 'osmosis') {
+      updateAndDrawOsmosis(dt);
+    } else if (appState.mode === 'active') {
+      updateAndDrawActive(dt);
+    } else if (appState.mode === 'exocytosis') {
+      updateAndDrawExocytosis(dt);
+    }
+
+    requestAnimationFrame(animationLoop);
+  }
+  // --- [ブロック：メインループ・UI更新JS] ここまで ---
+
+  // --- [ブロック：確認ミニクイズ処理JS] ここから ---
+  const QUIZ_LIST = [
+    {
+      q: '拡散・浸透・濾過に共通する特徴として正しいものはどれか？',
+      options: [
+        'エネルギーを必要としない受動輸送である',
+        'ATPを消費する能動輸送である',
+        '細胞膜と小胞が融合して起こる',
+        'ポンプを用いて濃度勾配に逆らって運ぶ'
+      ],
+      answerIndex: 0,
+      explain: '拡散・浸透・濾過はいずれもエネルギー（ATP）を必要としない受動輸送です。'
+    },
+    {
+      q: '細胞外液に多く含まれるイオンの組み合わせとして正しいものはどれか？',
+      options: [
+        'K⁺ と タンパク質の陰イオン',
+        'Na⁺ と Cl⁻',
+        'K⁺ と HPO₄²⁻',
+        'Cl⁻ と HPO₄²⁻'
+      ],
+      answerIndex: 1,
+      explain: '細胞外液には Na⁺ と Cl⁻ が多く、細胞内液には K⁺、HPO₄²⁻、タンパク質の陰イオンが多く含まれます。'
+    },
+    {
+      q: '半透膜を隔てて濃度差があるとき、水分子が濃度の低い側から高い側へ移動する現象はどれか？',
+      options: [
+        '拡散',
+        '能動輸送',
+        '浸透',
+        '開口分泌'
+      ],
+      answerIndex: 2,
+      explain: '半透膜は水を通し溶質を通さないため、水分子が濃度の高い側へ移動する「浸透」が起こります。'
+    },
+    {
+      q: '細胞内から細胞外へ、ATPをADPに分解するエネルギーとポンプを使って運ぶ仕組みはどれか？',
+      options: [
+        '濾過',
+        '拡散',
+        '浸透',
+        '能動輸送'
+      ],
+      answerIndex: 3,
+      explain: 'ポンプとATPのエネルギーを使って濃度勾配に逆らい移動させる仕組みが能動輸送です。'
+    }
+  ];
+
+  const elQuizProgress = document.getElementById('quizProgress');
+  const elQuizQuestion = document.getElementById('quizQuestion');
+  const elQuizOptions = document.getElementById('quizOptions');
+  const elQuizFeedback = document.getElementById('quizFeedback');
+  const elBtnNextQuiz = document.getElementById('btnNextQuiz');
+
+  let quizIndex = 0;
+  let quizAnswered = false;
+
+  function renderQuiz() {
+    const item = QUIZ_LIST.at(quizIndex);
+    if (!item) return;
+
+    quizAnswered = false;
+    elQuizProgress.textContent = '問題 ' + (quizIndex + 1) + ' / ' + QUIZ_LIST.length;
+    elQuizQuestion.textContent = item.q;
+    elQuizFeedback.style.display = 'none';
+    elQuizFeedback.textContent = '';
+    elQuizOptions.innerHTML = '';
+
+    item.options.forEach(function(optText, idx) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quiz-opt-btn';
+      btn.textContent = (idx + 1) + '. ' + optText;
+      btn.addEventListener('click', function() {
+        handleQuizAnswer(idx, btn);
+      });
+      elQuizOptions.appendChild(btn);
+    });
+  }
+
+  function handleQuizAnswer(selectedIndex, clickedBtn) {
+    if (quizAnswered) return;
+    quizAnswered = true;
+
+    const item = QUIZ_LIST.at(quizIndex);
+    const allBtns = elQuizOptions.querySelectorAll('.quiz-opt-btn');
+    const isCorrect = selectedIndex === item.answerIndex;
+
+    if (isCorrect) {
+      clickedBtn.classList.add('is-correct');
+      elQuizFeedback.textContent = '正解！ ' + item.explain;
+      showToast('正解です！');
+    } else {
+      clickedBtn.classList.add('is-wrong');
+      const correctBtn = allBtns.item(item.answerIndex);
+      if (correctBtn) correctBtn.classList.add('is-correct');
+      elQuizFeedback.textContent = '不正解。解説：' + item.explain;
+      showToast('解説を確認しましょう');
+    }
+    elQuizFeedback.style.display = 'block';
+  }
+  // --- [ブロック：確認ミニクイズ処理JS] ここまで ---
+
+  // --- [ブロック：イベント登録・初期化JS] ここから ---
+  tabButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const nextMode = btn.dataset.mode;
+      initModeSimulation(nextMode);
+      applyModeUI(nextMode);
+      showToast(MODE_DATA[nextMode].heading + ' に切り替えました');
+    });
+  });
+
+  elBtnTogglePlay.addEventListener('click', function() {
+    appState.isPlaying = !appState.isPlaying;
+    elBtnTogglePlay.textContent = appState.isPlaying ? '一時停止' : '再生する';
+    showToast(appState.isPlaying ? 'シミュレーションを再開しました' : '一時停止しました');
+  });
+
+  elBtnReset.addEventListener('click', function() {
+    initModeSimulation(appState.mode);
+    showToast('初期状態にリセットしました');
+  });
+
+  elBtnSpecial.addEventListener('click', function() {
+    if (appState.mode === 'diffusion') {
+      initModeSimulation('diffusion');
+      showToast('溶質分子を底に再投入しました');
+    } else if (appState.mode === 'osmosis') {
+      initModeSimulation('osmosis');
+      showToast('左右の液面をリセットしました');
+    } else if (appState.mode === 'active') {
+      appState.atpQueue++;
+      showToast('ATPを投入しました（ポンプが作動します）');
+    } else if (appState.mode === 'exocytosis') {
+      appState.exoCycle = 0.56;
+      showToast('小胞が細胞膜と融合して放出されます');
+    }
+  });
+
+  elSpeedRange.addEventListener('input', function() {
+    appState.speed = parseFloat(elSpeedRange.value);
+    elSpeedLabel.textContent = appState.speed.toFixed(1) + 'x';
+  });
+
+  elBtnNextQuiz.addEventListener('click', function() {
+    quizIndex = (quizIndex + 1) % QUIZ_LIST.length;
+    renderQuiz();
+  });
+
+  // 初期起動
+  initModeSimulation('diffusion');
+  applyModeUI('diffusion');
+  renderQuiz();
+  requestAnimationFrame(animationLoop);
+  // --- [ブロック：イベント登録・初期化JS] ここまで ---
+
+  // === [新規機能追加エリア：JS] 新しいJSブロックはこの真上に貼り付け ===
+</script>
+</body>
+</html>
